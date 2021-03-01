@@ -1,0 +1,113 @@
+// SETTINGS
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+// MODELS
+model Customer {
+  id         String @id @default(uuid())
+  email      String @unique
+  password   String
+  first_name String
+  last_name  String
+
+  favorites Service[]
+  ratings   Rating[]
+}
+
+model Service {
+  id      String   @id @default(uuid())
+  name    String
+  email   String   @unique
+  avatar  String?
+  orders  Order[]
+  ratings Rating[]
+  menu    Item[]
+
+  category    ServiceCategory[]
+  description String?
+  country     String?
+  city        String?
+  address     String?
+  phone       String?
+  web         String?
+
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
+}
+
+model Order {
+  id        String   @id @default(uuid())
+  service   Service? @relation(fields: [serviceId], references: [id])
+  serviceId String?
+  items     Item[]
+
+  payment     Payment   @default(CASH)
+  status      Status    @default(WAITING)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model Item {
+  id          String       @id @default(uuid())
+  avatar      String?
+  title       String
+  description String?
+  price       Float
+  weight      Float
+  category    ItemCategory
+
+  order   Order?  @relation(fields: [orderId], references: [id])
+  orderId String?
+
+  service   Service? @relation(fields: [serviceId], references: [id])
+  serviceId String?
+}
+
+model Rating {
+  value Float
+
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
+
+  service   Service @relation(fields: [serviceId], references: [id])
+  serviceId String
+
+  @@unique([customerId, serviceId])
+}
+
+enum Status {
+  WAITING
+  CONFIRMED
+  SENT
+  COMPLETED
+}
+
+enum Payment {
+  CASH
+  CARD
+  ONLINE
+}
+
+enum ServiceCategory {
+  RESTAURANT
+  CANTEEN
+  PIZZA
+  DELIVERY
+  PATISSERIE
+  PUB
+  FASTFOOD
+}
+
+enum ItemCategory {
+  DRINK
+  SOUP
+  PIZZA
+  MEAT
+  DESSERT
+}
