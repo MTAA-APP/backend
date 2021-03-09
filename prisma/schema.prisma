@@ -19,8 +19,9 @@ model Customer {
   phone      String?
   address    Address?  @relation(fields: [addressId], references: [id]) // 1-1
   addressId  String?
-  cart       Order?    @relation(fields: [orderId], references: [id]) // 1-1
+  cart       Order?    @relation("CustomerCart", fields: [orderId], references: [id]) // 1-1
   orderId    String?
+  orders     Order[] // 1-n
   favorites  Service[] // 1-n
   ratings    Rating[] // 1-n
 }
@@ -58,7 +59,9 @@ model Order {
   service     Service?    @relation(fields: [serviceId], references: [id]) // n-1
   serviceId   String?
   items       OrderItem[] // 1-n
-  customer    Customer? // 1-1
+  customer    Customer?   @relation(fields: [customerId], references: [id]) // 1-n
+  customerId  String?
+  owner       Customer?   @relation("CustomerCart") // 1-1
   payment     Payment     @default(CASH)
   status      Status      @default(WAITING)
   completedAt DateTime?
@@ -75,15 +78,15 @@ model OrderItem {
 }
 
 model Item {
-  id          String       @id @default(uuid())
+  id          String         @id @default(uuid())
   name        String
   description String?
   picture     String?
   price       Float
   weight      Float?
   time        Float?
-  category    ItemCategory
-  service     Service      @relation(fields: [serviceId], references: [id]) // 1-n
+  categories  ItemCategory[]
+  service     Service        @relation(fields: [serviceId], references: [id]) // 1-n
   serviceId   String
   order_items OrderItem[] // 1-n
 }
@@ -100,6 +103,7 @@ model Rating {
 
 enum Status {
   WAITING
+  READY
   CONFIRMED
   SENT
   COMPLETED
