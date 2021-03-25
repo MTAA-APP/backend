@@ -5,11 +5,12 @@ import cors from 'cors'
 
 import { getUser } from '@/utils/global'
 import { corsOptions } from '@/config/cors'
-import { home } from '@/routes'
+import { errorHandler } from './utils/middleware'
+import { auth, services, profile, orders, items, cart } from '@/routes'
 
 const prisma = new PrismaClient()
 const app = express()
-const port = process.env.PORT || 4466
+const port = process.env.PORT
 
 app.disable('x-powered-by')
 app.set('trust proxy', 1)
@@ -26,6 +27,13 @@ const middleware = (req: Request, res: Response, next: NextFunction) => {
 
 app.use(middleware)
 
-app.use('/', home)
+app.use('/', auth)
+app.use('/services', services)
+app.use('/orders', orders)
+app.use('/items', items)
+app.use('/cart', cart)
+app.use('/profile', profile)
+
+app.use(errorHandler)
 
 app.listen(port, () => console.log(`🚀 Server listening on port ${port}.`))
