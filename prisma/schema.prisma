@@ -10,58 +10,59 @@ datasource db {
 
 // MODELS
 model Customer {
-  id         String    @id @default(uuid())
-  email      String    @unique
-  password   String
-  first_name String
-  last_name  String
-  payment    Payment   @default(CASH)
-  phone      String?
-  address    Address?  @relation(fields: [addressId], references: [id]) // 1-1
-  addressId  String?
-  cart       Order?    @relation("CustomerCart", fields: [orderId], references: [id]) // 1-1
-  orderId    String?
-  orders     Order[] // 1-n
-  favorites  Service[] // 1-n
-  ratings    Rating[] // 1-n
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  firstName String
+  lastName  String
+  payment   Payment   @default(CASH)
+  phone     String?
+  address   Address?  @relation(fields: [addressId], references: [id])
+  addressId String?
+  cart      Order?    @relation("CustomerCart", fields: [orderId], references: [id])
+  orderId   String?
+  orders    Order[]
+  favorites Service[]
+  ratings   Rating[]
 }
 
 model Service {
-  id          String            @id @default(uuid())
-  email       String            @unique
-  password    String
-  name        String
-  description String?
-  picture     String?
-  phone       String?
-  web         String?
-  category    ServiceCategory[]
-  orders      Order[] // 1-n
-  ratings     Rating[] // 1-n
-  menu        Item[] // 1-n
-  address     Address?          @relation(fields: [addressId], references: [id]) // 1-1
-  addressId   String?
-  customers   Customer[] // n-m
+  id           String          @id @default(uuid())
+  email        String          @unique
+  password     String
+  name         String
+  description  String?
+  picture      String?
+  phone        String?
+  web          String?
+  category     ServiceCategory
+  openingHours OpeningHour[]
+  orders       Order[]
+  ratings      Rating[]
+  menu         Item[]
+  address      Address?        @relation(fields: [addressId], references: [id])
+  addressId    String?
+  customers    Customer[]
 }
 
 model Address {
-  id          String    @id @default(uuid())
-  customer    Customer? // 1-1
-  service     Service? // 1-1
-  country     String?
-  city        String?
-  address     String?
-  postal_code String?
+  id         String    @id @default(uuid())
+  customer   Customer?
+  service    Service?
+  country    String?
+  city       String?
+  street     String?
+  postalCode String?
 }
 
 model Order {
   id          String      @id @default(uuid())
-  service     Service?    @relation(fields: [serviceId], references: [id]) // n-1
+  service     Service?    @relation(fields: [serviceId], references: [id])
   serviceId   String?
-  items       OrderItem[] // 1-n
-  customer    Customer?   @relation(fields: [customerId], references: [id]) // 1-n
+  items       OrderItem[]
+  customer    Customer?   @relation(fields: [customerId], references: [id])
   customerId  String?
-  owner       Customer?   @relation("CustomerCart") // 1-1
+  owner       Customer?   @relation("CustomerCart")
   payment     Payment     @default(CASH)
   status      Status      @default(WAITING)
   completedAt DateTime?
@@ -71,9 +72,9 @@ model Order {
 model OrderItem {
   id      String @id @default(uuid())
   amount  Int    @default(1)
-  item    Item   @relation(fields: [itemId], references: [id]) // 1-1
+  item    Item   @relation(fields: [itemId], references: [id])
   itemId  String
-  order   Order  @relation(fields: [orderId], references: [id]) // 1-1
+  order   Order  @relation(fields: [orderId], references: [id])
   orderId String
 }
 
@@ -86,21 +87,31 @@ model Item {
   weight      Float?
   time        Float?
   categories  ItemCategory[]
-  service     Service        @relation(fields: [serviceId], references: [id]) // 1-n
+  service     Service        @relation(fields: [serviceId], references: [id])
   serviceId   String
-  order_items OrderItem[] // 1-n
+  orderItems  OrderItem[]
 }
 
 model Rating {
   value      Float
-  customer   Customer @relation(fields: [customerId], references: [id]) // 1-n
+  customer   Customer @relation(fields: [customerId], references: [id])
   customerId String
-  service    Service  @relation(fields: [serviceId], references: [id]) // 1-n
+  service    Service  @relation(fields: [serviceId], references: [id])
   serviceId  String
 
   @@unique([customerId, serviceId])
 }
 
+model OpeningHour {
+  id        String   @id @default(uuid())
+  day       Day
+  from      DateTime
+  to        DateTime
+  service   Service? @relation(fields: [serviceId], references: [id])
+  serviceId String?
+}
+
+// ENUMS
 enum Status {
   WAITING
   READY
@@ -131,4 +142,14 @@ enum ItemCategory {
   PIZZA
   MEAT
   DESSERT
+}
+
+enum Day {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
 }
