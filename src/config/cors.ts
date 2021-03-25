@@ -1,5 +1,5 @@
 const allowedOrigins = [
-  // process.env.DOCUMENTATION_URL,
+  process.env.DOCUMENTATION_URL,
   process.env.LOCALHOST_URL,
 ]
 
