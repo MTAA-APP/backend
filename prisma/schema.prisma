@@ -1,0 +1,155 @@
+// SETTINGS
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+// MODELS
+model Customer {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  firstName String
+  lastName  String
+  payment   Payment   @default(CASH)
+  phone     String?
+  address   Address?  @relation(fields: [addressId], references: [id])
+  addressId String?
+  cart      Order?    @relation("CustomerCart", fields: [orderId], references: [id])
+  orderId   String?
+  orders    Order[]
+  favorites Service[]
+  ratings   Rating[]
+}
+
+model Service {
+  id           String          @id @default(uuid())
+  email        String          @unique
+  password     String
+  name         String
+  description  String?
+  picture      String?
+  phone        String?
+  web          String?
+  category     ServiceCategory
+  openingHours OpeningHour[]
+  orders       Order[]
+  ratings      Rating[]
+  menu         Item[]
+  address      Address?        @relation(fields: [addressId], references: [id])
+  addressId    String?
+  customers    Customer[]
+}
+
+model Address {
+  id         String    @id @default(uuid())
+  customer   Customer?
+  service    Service?
+  country    String?
+  city       String?
+  street     String?
+  postalCode String?
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  service     Service?    @relation(fields: [serviceId], references: [id])
+  serviceId   String?
+  items       OrderItem[]
+  customer    Customer?   @relation(fields: [customerId], references: [id])
+  customerId  String?
+  owner       Customer?   @relation("CustomerCart")
+  payment     Payment     @default(CASH)
+  status      Status      @default(WAITING)
+  completedAt DateTime?
+  createdAt   DateTime    @default(now())
+}
+
+model OrderItem {
+  id      String @id @default(uuid())
+  amount  Int    @default(1)
+  item    Item   @relation(fields: [itemId], references: [id])
+  itemId  String
+  order   Order  @relation(fields: [orderId], references: [id])
+  orderId String
+}
+
+model Item {
+  id          String         @id @default(uuid())
+  name        String
+  description String?
+  picture     String?
+  price       Float
+  weight      Float?
+  time        Float?
+  categories  ItemCategory[]
+  service     Service        @relation(fields: [serviceId], references: [id])
+  serviceId   String
+  orderItems  OrderItem[]
+}
+
+model Rating {
+  value      Float
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
+  service    Service  @relation(fields: [serviceId], references: [id])
+  serviceId  String
+
+  @@unique([customerId, serviceId])
+}
+
+model OpeningHour {
+  id        String   @id @default(uuid())
+  day       Day
+  from      DateTime
+  to        DateTime
+  service   Service? @relation(fields: [serviceId], references: [id])
+  serviceId String?
+}
+
+// ENUMS
+enum Status {
+  WAITING
+  READY
+  CONFIRMED
+  SENT
+  COMPLETED
+}
+
+enum Payment {
+  CASH
+  CARD
+  ONLINE
+}
+
+enum ServiceCategory {
+  RESTAURANT
+  CANTEEN
+  PIZZA
+  DELIVERY
+  PATISSERIE
+  PUB
+  FASTFOOD
+}
+
+enum ItemCategory {
+  DRINK
+  SOUP
+  PIZZA
+  MEAT
+  DESSERT
+}
+
+enum Day {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}

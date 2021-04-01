@@ -1,0 +1,6 @@
+{
+  "ignore": ["node_modules"],
+  "watch": ["src", "package-lock.json"],
+  "exec": "babel-node src/index.ts --extensions \".ts\"",
+  "ext": "ts"
+}
