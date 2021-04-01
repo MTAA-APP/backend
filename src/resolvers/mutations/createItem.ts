@@ -5,7 +5,7 @@ import { Item, ItemCategory } from '.prisma/client'
 
 type Body = {
   id: string
-  photo: string
+  picture: string
   name: string
   price: number
   categories: ItemCategory[]
@@ -31,7 +31,7 @@ export default async (req: Request, res: Response) => {
       },
       select: {
         id: true,
-        photo: true,
+        picture: true,
         name: true,
         price: true,
         categories: true,

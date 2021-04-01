@@ -14,7 +14,7 @@ export default async (req: Request, res: Response) => {
       data: {
         menu: {
           delete: {
-            where: { id },
+            id,
           },
         },
       },

@@ -11,6 +11,12 @@ type Params = {
 export default async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params as Params
 
+  const item: OrderItem = await res.locals.prisma.orderItem.findUnique({
+    where: { id },
+  })
+
+  if (!item) return next(throwError(StatusCodes.NOT_FOUND))
+
   const orderItem: OrderItem = await res.locals.prisma.orderItem.update({
     where: { id },
     data: {
@@ -23,8 +29,6 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       amount: true,
     },
   })
-
-  if (!orderItem) return next(throwError(StatusCodes.NOT_FOUND))
 
   if (orderItem?.amount <= 0)
     await res.locals.prisma.orderItem.delete({

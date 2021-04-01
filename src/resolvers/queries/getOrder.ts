@@ -13,14 +13,6 @@ export default async (req: Request, res: Response) => {
   const order: Order = await res.locals.prisma.order.findUnique({
     where: {
       id,
-      status: {
-        not: {
-          equals: Status.WAITING,
-        },
-      },
-      service: {
-        id: res.locals.user.id,
-      },
     },
     select: {
       id: true,

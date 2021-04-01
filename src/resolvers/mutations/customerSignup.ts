@@ -19,25 +19,26 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
   const hashedPassword = await getPassword(password)
 
-  const customer: Customer = await res.locals.prisma.customer.create({
-    data: {
-      ...data,
-      password: hashedPassword,
-    },
-    select: {
-      id: true,
-      email: true,
-    },
-  })
+  await res.locals.prisma.customer
+    .create({
+      data: {
+        ...data,
+        password: hashedPassword,
+      },
+      select: {
+        id: true,
+        email: true,
+      },
+    })
+    .then((customer: Customer) => {
+      const user: User = {
+        ...customer,
+        role: Role.CUSTOMER,
+      }
 
-  if (!customer) return next(throwError(StatusCodes.BAD_REQUEST))
+      const token: string = getToken(user)
 
-  const user: User = {
-    ...customer,
-    role: Role.CUSTOMER,
-  }
-
-  const token: string = getToken(user)
-
-  res.status(StatusCodes.CREATED).json({ user, token })
+      res.status(StatusCodes.CREATED).json({ user, token })
+    })
+    .catch(() => next(throwError(StatusCodes.BAD_REQUEST)))
 }

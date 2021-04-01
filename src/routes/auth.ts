@@ -11,6 +11,6 @@ router
   .get('/me', auth, getMe)
   .post('/signin', signin)
   .post('/signup/customer', customerSignup)
-  .post('signup/service', serviceSignup)
+  .post('/signup/service', serviceSignup)
 
 export default router
