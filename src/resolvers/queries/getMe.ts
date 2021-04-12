@@ -6,6 +6,8 @@ import { getRole } from '@/utils/global'
 import { User } from '@/types/global'
 
 export default async (req: Request, res: Response) => {
+  if (!res?.locals?.user) return res.status(StatusCodes.OK).json(null)
+
   const getCustomer: Customer = res.locals.prisma.customer.findUnique({
     where: { id: res.locals.user.id },
     select: {
