@@ -39,6 +39,14 @@ export default async (req: Request, res: Response) => {
       name: true,
       picture: true,
       category: true,
+      customers: {
+        where: {
+          id: res?.locals?.user?.id,
+        },
+        select: {
+          id: true,
+        },
+      },
     },
   })
 
