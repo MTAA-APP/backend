@@ -16,6 +16,7 @@ export default async (req: Request, res: Response) => {
       id: true,
       email: true,
       name: true,
+      description: true,
       picture: true,
       phone: true,
       web: true,
