@@ -37,11 +37,11 @@ export default async (req: Request, res: Response, next: NextFunction) => {
               },
             },
           },
-        },
-        service: {
-          select: {
-            id: true,
-            name: true,
+          service: {
+            select: {
+              id: true,
+              name: true,
+            },
           },
         },
       },
