@@ -19,3 +19,4 @@ export { default as getItem } from './getItem'
 
 // Cart
 export { default as getCart } from './getCart'
+export { default as getCartInfo } from './getCartInfo'
