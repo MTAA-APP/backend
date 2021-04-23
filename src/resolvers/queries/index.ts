@@ -12,6 +12,7 @@ export { default as getServiceProfile } from './getServiceProfile'
 // Orders
 export { default as getOrders } from './getOrders'
 export { default as getOrder } from './getOrder'
+export { default as getMyOrders } from './getMyOrders'
 
 // Items
 export { default as getItems } from './getItems'
