@@ -7,6 +7,7 @@ export default async (req: Request, res: Response) => {
   const service: Service = await res.locals.prisma.service.findUnique({
     where: { id: res.locals.user.id },
     select: {
+      id: true,
       picture: true,
       email: true,
       name: true,
