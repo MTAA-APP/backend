@@ -1,16 +1,29 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 
-import { Order, Status } from '.prisma/client'
+import { Item, Order, OrderItem } from '.prisma/client'
 
 type Params = {
   id: string
 }
 
+type Acc = {
+  count: number
+  price: number
+}
+
+interface OrderItemI extends OrderItem {
+  item: Item
+}
+
+interface OrderI extends Order {
+  items: OrderItemI[]
+}
+
 export default async (req: Request, res: Response) => {
   const { id } = req.params as Params
 
-  const order: Order = await res.locals.prisma.order.findUnique({
+  const order: OrderI = await res.locals.prisma.order.findUnique({
     where: {
       id,
     },
@@ -56,5 +69,17 @@ export default async (req: Request, res: Response) => {
     },
   })
 
-  res.status(StatusCodes.OK).json(order)
+  const data = {
+    ...order,
+    total: order?.items?.reduce(
+      (acc: Acc, curr: OrderItemI) => {
+        acc.count += curr.amount
+        acc.price += curr.amount * curr.item.price
+        return acc
+      },
+      { count: 0, price: 0 }
+    ),
+  }
+
+  res.status(StatusCodes.OK).json(data)
 }
