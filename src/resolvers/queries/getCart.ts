@@ -1,10 +1,23 @@
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 
-import { Customer, Order } from '.prisma/client'
+import { Customer, Item, Order, OrderItem } from '.prisma/client'
+
+type Acc = {
+  count: number
+  price: number
+}
+
+interface OrderItemI extends OrderItem {
+  item: Item
+}
+
+interface OrderI extends Order {
+  items: OrderItemI[]
+}
 
 interface CustomerI extends Customer {
-  cart: Order
+  cart: OrderI
 }
 
 export default async (req: Request, res: Response, next: NextFunction) => {
@@ -55,5 +68,17 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     },
   })
 
-  res.status(StatusCodes.OK).json(customer?.cart)
+  const data = {
+    ...customer?.cart,
+    total: customer?.cart?.items?.reduce(
+      (acc: Acc, curr: OrderItemI) => {
+        acc.count += curr.amount
+        acc.price += curr.amount * curr.item.price
+        return acc
+      },
+      { count: 0, price: 0 }
+    ),
+  }
+
+  res.status(StatusCodes.OK).json(data)
 }
