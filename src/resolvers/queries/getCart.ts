@@ -24,6 +24,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
               amount: true,
               item: {
                 select: {
+                  id: true,
                   name: true,
                   picture: true,
                   price: true,
@@ -31,6 +32,10 @@ export default async (req: Request, res: Response, next: NextFunction) => {
                 },
               },
             },
+          },
+          service: {
+            id: true,
+            name: true,
           },
           owner: {
             select: {
