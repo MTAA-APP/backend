@@ -47,8 +47,10 @@ export default async (req: Request, res: Response, next: NextFunction) => {
             },
           },
           service: {
-            id: true,
-            name: true,
+            select: {
+              id: true,
+              name: true,
+            },
           },
           owner: {
             select: {
