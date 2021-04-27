@@ -5,8 +5,6 @@ type Params = {
   id: string
 }
 
-// TODO: soft delete
-
 export default async (req: Request, res: Response) => {
   const { id } = req.params as Params
 
