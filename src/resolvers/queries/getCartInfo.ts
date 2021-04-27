@@ -13,7 +13,7 @@ interface OrderItemI extends OrderItem {
 }
 
 interface OrderI extends Order {
-  items: OrderItemI[]
+  items: [OrderItemI]
 }
 
 interface CustomerI extends Customer {
@@ -27,21 +27,12 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       cart: {
         select: {
           id: true,
-          payment: true,
-          status: true,
-          createdAt: true,
-          completedAt: true,
           items: {
             select: {
-              id: true,
               amount: true,
               item: {
                 select: {
-                  id: true,
-                  name: true,
-                  picture: true,
                   price: true,
-                  categories: true,
                 },
               },
             },
@@ -52,19 +43,6 @@ export default async (req: Request, res: Response, next: NextFunction) => {
               name: true,
             },
           },
-          owner: {
-            select: {
-              payment: true,
-              address: {
-                select: {
-                  country: true,
-                  city: true,
-                  street: true,
-                  postalCode: true,
-                },
-              },
-            },
-          },
         },
       },
     },
@@ -72,7 +50,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
   const data = {
     ...customer?.cart,
-    total: customer?.cart?.items?.reduce(
+    items: customer?.cart?.items?.reduce(
       (acc: Acc, curr: OrderItemI) => {
         acc.count += curr.amount
         acc.price += curr.amount * curr.item.price

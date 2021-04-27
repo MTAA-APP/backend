@@ -1,14 +1,15 @@
 import { Router } from 'express'
 
-import { auth, service } from '@/utils/middleware'
+import { auth, customer, service } from '@/utils/middleware'
 
-import { getOrders, getOrder } from '@/resolvers/queries'
+import { getOrders, getOrder, getMyOrders } from '@/resolvers/queries'
 import { updateOrderStatus } from '@/resolvers/mutations'
 
 const router = Router()
 
 router
-  .get('/', auth, getOrders)
+  .get('/', [auth, service], getOrders)
+  .get('/history', [auth, customer], getMyOrders)
   .get('/:id', auth, getOrder)
   .put('/status', [auth, service], updateOrderStatus)
 

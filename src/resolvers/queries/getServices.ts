@@ -1,7 +1,11 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 
-import { Service, ServiceCategory } from '.prisma/client'
+import { Customer, Service, ServiceCategory } from '.prisma/client'
+
+interface ServiceI extends Service {
+  customers: Customer[]
+}
 
 type Query = {
   favorites: string
@@ -12,7 +16,7 @@ type Query = {
 export default async (req: Request, res: Response) => {
   const { favorites, search, category } = req.query as Query
 
-  const services: Service[] = await res.locals.prisma.service.findMany({
+  const services: ServiceI[] = await res.locals.prisma.service.findMany({
     where: {
       ...(!!search && {
         name: {
@@ -39,8 +43,21 @@ export default async (req: Request, res: Response) => {
       name: true,
       picture: true,
       category: true,
+      customers: {
+        where: {
+          id: res?.locals?.user?.id,
+        },
+        select: {
+          id: true,
+        },
+      },
     },
   })
 
-  res.status(StatusCodes.OK).json(services)
+  const data = services?.map((item: ServiceI) => ({
+    ...item,
+    customers: !!item?.customers?.length,
+  }))
+
+  res.status(StatusCodes.OK).json(data)
 }
